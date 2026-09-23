@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nova Job Finder</title>
+  <style>
+    :root {
+      --ink: #18231f;
+      --muted: #6f7b75;
+      --paper: #f7f6f0;
+      --panel: #fffefa;
+      --line: #dfe4dc;
+      --accent: #d85e37;
+      --accent-dark: #9f3e20;
+      --mint: #d9ece1;
+      --shadow: 0 18px 55px rgba(48, 62, 53, .09);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Avenir Next", "Trebuchet MS", sans-serif;
+      font-size: 15px;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0 0 auto;
+      height: 9px;
+      background: var(--accent);
+      z-index: 2;
+    }
+    .shell { width: min(1440px, calc(100% - 48px)); margin: 0 auto; }
+    header { padding: 62px 0 30px; display: flex; justify-content: space-between; gap: 32px; align-items: end; }
+    .eyebrow { color: var(--accent-dark); font-weight: 800; letter-spacing: .13em; text-transform: uppercase; font-size: 11px; }
+    h1 { margin: 8px 0 10px; font-size: clamp(34px, 5vw, 62px); line-height: .96; letter-spacing: -.055em; font-weight: 800; }
+    .intro { color: var(--muted); max-width: 520px; line-height: 1.6; margin: 0; }
+    .data-status { text-align: right; color: var(--muted); font-size: 13px; }
+    .data-status strong { display: block; color: var(--ink); font-size: 25px; line-height: 1.1; }
+    .toolbar { background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow); padding: 18px; border-radius: 4px; }
+    .filters { display: grid; grid-template-columns: minmax(220px, 2fr) repeat(4, minmax(130px, 1fr)) auto; gap: 10px; align-items: end; }
+    label { display: grid; gap: 6px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+    input, select, button { min-height: 44px; border: 1px solid var(--line); border-radius: 3px; background: #fff; color: var(--ink); font: inherit; }
+    input, select { padding: 0 12px; outline: none; }
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(216, 94, 55, .12); }
+    button { cursor: pointer; padding: 0 15px; font-weight: 800; }
+    .clear { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .clear:hover { background: var(--accent-dark); }
+    .search { position: relative; }
+    .search input { padding-left: 38px; width: 100%; }
+    .search::before { content: "⌕"; position: absolute; left: 13px; bottom: 8px; color: var(--accent); font-size: 25px; line-height: 1; }
+    .helper { display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 14px 2px 0; color: var(--muted); font-size: 13px; }
+    .table-wrap { margin: 22px 0 40px; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow); overflow: hidden; }
+    table { border-collapse: collapse; width: 100%; min-width: 900px; }
+    .table-scroll { overflow-x: auto; }
+    th { text-align: left; background: #eef3ed; color: #617068; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; padding: 14px 16px; white-space: nowrap; }
+    td { padding: 16px; border-top: 1px solid var(--line); vertical-align: top; }
+    tbody tr:hover { background: #fff7f1; }
+    .title { font-weight: 800; max-width: 310px; line-height: 1.3; }
+    .company { margin-top: 5px; color: var(--muted); font-size: 13px; }
+    .location { font-weight: 700; }
+    .source { color: var(--muted); font-size: 12px; margin-top: 5px; }
+    .pill { display: inline-block; padding: 5px 8px; border-radius: 20px; background: var(--mint); color: #28543e; font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .pill.neutral { background: #f0ede7; color: #766b5b; }
+    .date { white-space: nowrap; color: var(--muted); font-size: 13px; }
+    .open { display: inline-flex; color: var(--accent-dark); font-weight: 800; text-decoration: none; font-size: 13px; white-space: nowrap; }
+    .open:hover { text-decoration: underline; }
+    .empty, .loading { padding: 62px 20px; text-align: center; color: var(--muted); }
+    .error { margin: 20px 0; padding: 16px; background: #fff0eb; border-left: 4px solid var(--accent); line-height: 1.5; }
+    .file-input { display: none; }
+    .upload { color: var(--accent-dark); cursor: pointer; font-weight: 800; text-decoration: underline; }
+    .footer { display: flex; justify-content: space-between; gap: 20px; align-items: center; padding: 0 16px 16px; color: var(--muted); font-size: 13px; }
+    .pagination { display: flex; gap: 8px; align-items: center; }
+    .pagination button { min-height: 34px; padding: 0 11px; background: transparent; }
+    .pagination button:disabled { cursor: default; opacity: .35; }
+    @media (max-width: 1050px) { .filters { grid-template-columns: repeat(3, 1fr); } .search { grid-column: span 3; } }
+    @media (max-width: 680px) { .shell { width: min(100% - 28px, 1440px); } header { display: block; padding-top: 45px; } .data-status { text-align: left; margin-top: 20px; } .filters { grid-template-columns: 1fr 1fr; } .search { grid-column: span 2; } .clear { width: 100%; } .helper, .footer { align-items: flex-start; flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <div class="eyebrow">Nova / Job intelligence</div>
+        <h1>Find work that fits.</h1>
+        <p class="intro">Search the job collection by title, company, skills, or place. Start broad, then narrow the list with the filters below.</p>
+      </div>
+      <div class="data-status"><strong id="totalCount">--</strong>jobs in your dataset</div>
+    </header>
+
+    <section class="toolbar" aria-label="Job filters">
+      <div class="filters">
+        <label class="search">Search
+          <input id="query" type="search" placeholder="Title, company, skill..." autocomplete="off">
+        </label>
+        <label>Location
+          <select id="location"><option value="">All locations</option></select>
+        </label>
+        <label>Remote
+          <select id="remote"><option value="">Any setup</option><option value="remote">Remote</option><option value="onsite">On-site / hybrid</option></select>
+        </label>
+        <label>Source
+          <select id="source"><option value="">All sources</option></select>
+        </label>
+        <label>Sort by
+          <select id="sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Title A-Z</option><option value="company">Company A-Z</option></select>
+        </label>
+        <button class="clear" id="clear" type="button">Reset</button>
+      </div>
+      <div class="helper">
+        <span id="resultSummary">Loading your jobs...</span>
+        <span>Showing 10 results per page</span>
+      </div>
+    </section>
+
+    <section class="table-wrap" aria-live="polite">
+      <div id="message" class="loading">Loading job_data.csv...</div>
+      <div class="table-scroll" id="tableArea" hidden>
+        <table>
+          <thead><tr><th>Role</th><th>Location</th><th>Work setup</th><th>Posted</th><th>Source</th><th></th></tr></thead>
+          <tbody id="jobs"></tbody>
+        </table>
+      </div>
+      <div class="footer" id="footer" hidden>
+        <span id="pageSummary"></span>
+        <div class="pagination"><button id="previous" type="button">Previous</button><button id="next" type="button">Next</button></div>
+      </div>
+    </section>
+
+    <input class="file-input" id="filePicker" type="file" accept=".csv,text/csv">
+  </main>
+
+  <script src="job_data.js"></script>
+  <script>
+    const state = { all: [], filtered: [], page: 1, pageSize: 10 };
+    const $ = (id) => document.getElementById(id);
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [], value = '', quoted = false;
+      for (let index = 0; index < text.length; index++) {
+        const character = text[index];
+        const next = text[index + 1];
+        if (character === '"' && quoted && next === '"') { value += '"'; index++; }
+        else if (character === '"') quoted = !quoted;
+        else if (character === ',' && !quoted) { row.push(value); value = ''; }
+        else if ((character === '\n' || character === '\r') && !quoted) {
+          if (character === '\r' && next === '\n') index++;
+          row.push(value); value = '';
+          if (row.some(cell => cell.trim())) rows.push(row);
+          row = [];
+        } else value += character;
+      }
+      if (value || row.length) { row.push(value); rows.push(row); }
+      const headers = rows.shift().map(header => header.trim());
+      return rows.map(cells => Object.fromEntries(headers.map((header, index) => [header, (cells[index] || '').trim()])));
+    }
+
+    function clean(value) { return value.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').trim(); }
+    function dateValue(value) { const parsed = Date.parse(value); return Number.isNaN(parsed) ? 0 : parsed; }
+    function formatDate(value) { const date = new Date(value); return Number.isNaN(date.getTime()) ? 'Unknown' : date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }); }
+    function uniqueValues(key) { return [...new Set(state.all.map(job => job[key]).filter(Boolean))].sort((a, b) => a.localeCompare(b)); }
+    function fillSelect(id, values) { $(id).innerHTML += values.map(value => `<option value="${escapeHTML(value)}">${escapeHTML(value)}</option>`).join(''); }
+    function escapeHTML(value) { return String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character])); }
+
+    function applyFilters() {
+      const query = $('query').value.toLowerCase().trim();
+      const location = $('location').value;
+      const remote = $('remote').value;
+      const source = $('source').value;
+      const sort = $('sort').value;
+      state.filtered = state.all.filter(job => {
+        const searchable = [job.job_title, job.company_name, job.location, job.skills_or_tags, job.job_description].join(' ').toLowerCase();
+        const remoteMatch = !remote || (remote === 'remote' ? /true|remote|yes/i.test(`${job.remote} ${job.job_description}`) : !/true|remote|yes/i.test(`${job.remote} ${job.job_description}`));
+        return (!query || searchable.includes(query)) && (!location || job.location === location) && (!source || job.source_platform === source) && remoteMatch;
+      });
+      state.filtered.sort((a, b) => sort === 'title' ? a.job_title.localeCompare(b.job_title) : sort === 'company' ? a.company_name.localeCompare(b.company_name) : sort === 'oldest' ? dateValue(a.posted_at) - dateValue(b.posted_at) : dateValue(b.posted_at) - dateValue(a.posted_at));
+      state.page = 1;
+      render();
+    }
+
+    function render() {
+      const totalPages = Math.max(1, Math.ceil(state.filtered.length / state.pageSize));
+      state.page = Math.min(state.page, totalPages);
+      const start = (state.page - 1) * state.pageSize;
+      const visible = state.filtered.slice(start, start + state.pageSize);
+      $('totalCount').textContent = state.all.length.toLocaleString();
+      $('resultSummary').textContent = `${state.filtered.length.toLocaleString()} matching ${state.filtered.length === 1 ? 'job' : 'jobs'}`;
+      $('pageSummary').textContent = state.filtered.length ? `${start + 1}-${Math.min(start + state.pageSize, state.filtered.length)} of ${state.filtered.length}` : 'No matching jobs';
+      $('previous').disabled = state.page === 1;
+      $('next').disabled = state.page === totalPages;
+      $('message').hidden = true;
+      $('tableArea').hidden = false;
+      $('footer').hidden = false;
+      $('jobs').innerHTML = visible.length ? visible.map(job => `<tr>
+        <td><div class="title">${escapeHTML(job.job_title || 'Untitled role')}</div><div class="company">${escapeHTML(job.company_name || 'Unknown company')}</div></td>
+        <td><div class="location">${escapeHTML(job.location || 'Not specified')}</div>${job.job_types ? `<div class="source">${escapeHTML(job.job_types)}</div>` : ''}</td>
+        <td><span class="pill ${/true|remote|yes/i.test(`${job.remote} ${job.job_description}`) ? '' : 'neutral'}">${/true|remote|yes/i.test(`${job.remote} ${job.job_description}`) ? 'Remote' : 'On-site / hybrid'}</span></td>
+        <td class="date">${formatDate(job.posted_at)}</td>
+        <td><div>${escapeHTML(job.source_platform || 'Unknown')}</div>${job.skills_or_tags ? `<div class="source">${escapeHTML(job.skills_or_tags.slice(0, 48))}</div>` : ''}</td>
+        <td>${job.source_url ? `<a class="open" href="${escapeHTML(job.source_url)}" target="_blank" rel="noopener">View job ↗</a>` : ''}</td>
+      </tr>`).join('') : '<tr><td colspan="6" class="empty">No jobs match those filters. Try a broader search.</td></tr>';
+    }
+
+    function loadJobs(text) {
+      state.all = parseCSV(text);
+      $('location').innerHTML = '<option value="">All locations</option>';
+      $('source').innerHTML = '<option value="">All sources</option>';
+      fillSelect('location', uniqueValues('location'));
+      fillSelect('source', uniqueValues('source_platform'));
+      applyFilters();
+    }
+
+    function loadJobRecords(records) {
+      state.all = records;
+      $('location').innerHTML = '<option value="">All locations</option>';
+      $('source').innerHTML = '<option value="">All sources</option>';
+      fillSelect('location', uniqueValues('location'));
+      fillSelect('source', uniqueValues('source_platform'));
+      applyFilters();
+    }
+
+    async function start() {
+      if (Array.isArray(window.NOVA_JOB_DATA)) {
+        loadJobRecords(window.NOVA_JOB_DATA);
+        return;
+      }
+      try {
+        const response = await fetch('job_data.csv');
+        if (!response.ok) throw new Error('CSV request failed');
+        loadJobs(await response.text());
+      } catch (error) {
+        $('message').innerHTML = 'Open this page through a local server, or <label class="upload" for="filePicker">choose job_data.csv</label> to load the data directly.';
+        $('message').className = 'error';
+      }
+    }
+
+    ['query', 'location', 'remote', 'source', 'sort'].forEach(id => $(id).addEventListener(id === 'query' ? 'input' : 'change', applyFilters));
+    $('clear').addEventListener('click', () => { $('query').value = ''; $('location').value = ''; $('remote').value = ''; $('source').value = ''; $('sort').value = 'newest'; applyFilters(); });
+    $('previous').addEventListener('click', () => { state.page--; render(); });
+    $('next').addEventListener('click', () => { state.page++; render(); });
+    $('filePicker').addEventListener('change', event => { const file = event.target.files[0]; if (file) file.text().then(loadJobs); });
+    start();
+  </script>
+</body>
+</html>
