@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Browse the AI Nova catalogue of books collected from Books to Scrape.">
+  <title>AI Nova | Book Catalogue</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="catalogue.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="wordmark" href="./">AI Nova <span>Book Catalogue</span></a>
+      <a class="repo-link" href="https://github.com/Lumimaki/AI-NOVA-Book-Scraping-Tool">View on GitHub</a>
+    </div>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <div class="shell hero-inner">
+        <div>
+          <p class="eyebrow">AI Nova scraping project</p>
+          <h1 id="page-title">The Book Catalogue</h1>
+          <p class="intro">Explore a dataset collected from <a href="https://books.toscrape.com/">Books to Scrape</a>. Browse covers, compare prices and ratings, or download the complete table.</p>
+          <a class="download" href="books.csv" download>Download book table</a>
+        </div>
+        <div id="hero-covers" class="hero-covers" aria-hidden="true"></div>
+      </div>
+    </section>
+    <section class="shell catalogue" aria-labelledby="browse-title">
+      <h2 id="browse-title" tabindex="-1">Browse books</h2>
+      <form id="filters" class="filters" role="search" hidden>
+        <label>Search by title
+          <input id="query" type="search" placeholder="e.g. Shakespeare" autocomplete="off">
+        </label>
+        <label>Rating
+          <select id="rating">
+            <option value="">All ratings</option>
+            <option value="5">5 stars</option>
+            <option value="4">4 stars</option>
+            <option value="3">3 stars</option>
+            <option value="2">2 stars</option>
+            <option value="1">1 star</option>
+          </select>
+        </label>
+        <label>Sort by
+          <select id="sort">
+            <option value="source">Catalogue order</option>
+            <option value="title">Title A–Z</option>
+            <option value="price-asc">Lowest price</option>
+            <option value="price-desc">Highest price</option>
+            <option value="rating">Highest rating</option>
+          </select>
+        </label>
+        <button type="reset" class="reset">Clear filters</button>
+      </form>
+      <p id="results-status" class="status" role="status">Loading books…</p>
+      <noscript><p>Enable JavaScript to browse the catalogue, or <a href="books.csv" download>download the book table</a>.</p></noscript>
+      <ul id="books" class="books" aria-label="Books"></ul>
+      <nav id="pagination" class="pagination" aria-label="Catalogue pages" hidden>
+        <button id="previous" type="button">Previous</button>
+        <span id="page-number"></span>
+        <button id="next" type="button">Next</button>
+      </nav>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="shell footer-inner"><span>AI Nova Book Scraping Project</span><a href="books.csv" download>Download CSV</a></div>
+  </footer>
+
+  <template id="book-card">
+    <li class="card">
+      <div class="cover"><img alt="" loading="lazy" width="150" height="200"></div>
+      <div class="book-details">
+        <h3><a class="book-title"></a></h3>
+        <p class="price"></p>
+        <div class="book-meta"><span class="rating"></span><span class="availability"></span></div>
+      </div>
+    </li>
+  </template>
+</body>
+</html>
