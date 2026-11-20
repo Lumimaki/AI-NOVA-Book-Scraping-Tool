@@ -22,6 +22,11 @@ const comparators = {
 let catalogue = [];
 let page = 1;
 
+function normalizeSearch(text) {
+  return text.normalize("NFKD").replace(/\p{M}/gu, "").toLocaleLowerCase("en-GB")
+    .replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+}
+
 function makeBookCard(book) {
   const card = template.content.cloneNode(true);
   const title = card.querySelector(".book-title");
@@ -30,6 +35,7 @@ function makeBookCard(book) {
   cover.src = book.cover_url;
   title.href = book.product_url;
   title.textContent = book.title;
+  card.querySelector(".book-author").textContent = book.author || "Author unavailable";
   card.querySelector(".price").textContent = currency.format(book.price);
   card.querySelector(".rating").textContent = `★ ${book.rating}/5`;
   card.querySelector(".availability").textContent = book.availability;
@@ -37,10 +43,11 @@ function makeBookCard(book) {
 }
 
 function render() {
-  const search = query.value.trim().toLocaleLowerCase("en-GB");
+  const search = normalizeSearch(query.value);
+  const terms = search ? search.split(" ") : [];
   const books = catalogue.filter(book =>
-    book.title.toLocaleLowerCase("en-GB").includes(search)
-    && (!rating.value || book.rating === Number(rating.value))
+    (!rating.value || book.rating === Number(rating.value))
+    && terms.every(term => book.searchText.includes(term))
   );
   if (sort.value !== "source") books.sort(comparators[sort.value]);
 
@@ -89,7 +96,11 @@ async function loadCatalogue() {
   try {
     const response = await fetch("books.json");
     if (!response.ok) throw new Error(`Catalogue request failed (${response.status})`);
-    catalogue = await response.json();
+    const books = await response.json();
+    catalogue = books.map(book => ({
+      ...book,
+      searchText: normalizeSearch(`${book.title} ${book.author || ""}`),
+    }));
     showHeroCovers(catalogue);
     render();
     filters.hidden = false;

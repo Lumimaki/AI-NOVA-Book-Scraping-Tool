@@ -30,8 +30,8 @@
     <section class="shell catalogue" aria-labelledby="browse-title">
       <h2 id="browse-title" tabindex="-1">Browse books</h2>
       <form id="filters" class="filters" role="search" hidden>
-        <label>Search by title
-          <input id="query" type="search" placeholder="e.g. Shakespeare" autocomplete="off">
+        <label>Search by title or author
+          <input id="query" type="search" placeholder="e.g. Sarah Waters" autocomplete="off">
         </label>
         <label>Rating
           <select id="rating">
@@ -73,6 +73,7 @@
       <div class="cover"><img alt="" loading="lazy" width="150" height="200"></div>
       <div class="book-details">
         <h3><a class="book-title"></a></h3>
+        <p class="book-author"></p>
         <p class="price"></p>
         <div class="book-meta"><span class="rating"></span><span class="availability"></span></div>
       </div>

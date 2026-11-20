@@ -11,8 +11,10 @@ from bs4 import BeautifulSoup
 
 CATALOGUE_URL = "https://books.toscrape.com/catalogue/"
 OUTPUT_DIR = Path(__file__).resolve().parent / "docs"
+AUTHORS_PATH = OUTPUT_DIR.parent / "data" / "book_authors.csv"
 RATINGS = {name: value for value, name in enumerate(("One", "Two", "Three", "Four", "Five"), 1)}
 TABLE_FIELDS = ("title", "price", "rating", "availability", "product_url")
+EXPORT_FIELDS = ("title", "author", "price", "rating", "availability", "product_url")
 
 
 def extract_books_from_page(page_num):
@@ -51,16 +53,20 @@ def scrape_all_books(total_pages=50):
 
 
 def export_books(books):
+    with AUTHORS_PATH.open(encoding="utf-8", newline="") as source:
+        authors = {row["product_url"]: row["author"] for row in csv.DictReader(source)}
+    catalogue = [{**book, "author": authors.get(book["product_url"], "")} for book in books]
+
     OUTPUT_DIR.mkdir(exist_ok=True)
     with (OUTPUT_DIR / "books.csv").open("w", encoding="utf-8", newline="") as output:
-        writer = csv.DictWriter(output, fieldnames=TABLE_FIELDS, lineterminator="\n")
+        writer = csv.DictWriter(output, fieldnames=EXPORT_FIELDS, lineterminator="\n")
         writer.writeheader()
-        for book in books:
-            row = {field: book[field] for field in TABLE_FIELDS}
+        for book in catalogue:
+            row = {field: book[field] for field in EXPORT_FIELDS}
             row["price"] = f'{row["price"]:.2f}'
             writer.writerow(row)
     with (OUTPUT_DIR / "books.json").open("w", encoding="utf-8") as output:
-        json.dump(books, output, ensure_ascii=False, indent=2)
+        json.dump(catalogue, output, ensure_ascii=False, indent=2)
         output.write("\n")
 
 
