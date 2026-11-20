@@ -116,6 +116,7 @@ button:hover:enabled { background: #eef0ff; border-color: #5967a1; }
 .book-details h3 { margin: 0 0 .7rem; font-size: 1rem; line-height: 1.35; overflow-wrap: anywhere; }
 .book-title { text-decoration: none; }
 .book-title:hover { text-decoration: underline; }
+.book-author { color: var(--muted); font-size: .875rem; margin: 0 0 .7rem; overflow-wrap: anywhere; }
 .price { margin: auto 0 .65rem; font-size: 1.1rem; font-weight: 800; }
 .book-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: .35rem .7rem; font-size: .875rem; }
 .rating { color: #78521b; font-weight: 750; }
