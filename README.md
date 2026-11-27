@@ -29,6 +29,10 @@ The public catalogue intentionally reads the checked-in JSON export, so visitors
 
 ## Demonstration
 
+![AI Nova Book Catalogue showing its hero, filters, record count, and book cards](screenshots/demo.png)
+
+The screenshot shows the real published interface and dataset text. External book-cover artwork was replaced with original neutral placeholders in the screenshot only to avoid redistributing third-party cover images. The live catalogue continues to load the cover URLs supplied by Books to Scrape.
+
 Open the [live catalogue](https://lumimaki.github.io/AI-NOVA-Book-Scraping-Tool/), search for `Sarah Waters`, change the rating or sort order, clear the filters, move to the next page, and use **Download book table** to inspect the complete dataset. The interface reports how many records match the current filters. No account or personal information is required.
 
 ## Run locally

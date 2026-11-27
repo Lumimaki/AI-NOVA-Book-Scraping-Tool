@@ -13,7 +13,7 @@ The audit inspected the repository root, Git status, tracked files, reachable lo
 | The README described the catalogue and regeneration command but did not explicitly cover every course heading. | Expanded the README with purpose, collection, persistence, interaction, setup, demonstration, learning, limitations, and AI assistance. |
 | The optional Supabase upload referenced credentials but provided no reproducible table definition. | Added `database/schema.sql` with the five fields uploaded by `scraper.py`, constraints, and `product_url` as the primary/upsert key. |
 | No audit record was present. | Added this sanitized `AUDIT.md`. |
-| A screenshot was not included. | Kept the public live catalogue as the short demonstration and added exact walkthrough steps. The course permits a screenshot or short demonstration. |
+| A screenshot was not included. | Added `screenshots/demo.png` and embedded it in the README while retaining the exact live-catalogue walkthrough. External cover artwork was replaced with original neutral placeholders in the screenshot only. |
 | `.env`, the nested Stillpoint repository, packaged extension files, workspace settings, and virtual environments needed to stay outside the Books repository. | Updated `.gitignore` rules exclude `.env`, `.venv/`, caches, editor and workspace settings, macOS metadata, `.pem` keys, `.crx` packages, and the separate `my-momentum/` folder. `.env.example` contains placeholders. |
 
 ### Checks that passed
@@ -23,6 +23,7 @@ The audit inspected the repository root, Git status, tracked files, reachable lo
 - The scraper loads Supabase credentials only from local environment variables and does not place them in the static browser files.
 - The exported CSV contains 1,000 data rows with a header, and the JSON contains 1,000 records with unique product URLs.
 - The public catalogue loaded and displayed 1,000 books with search, rating, sorting, pagination, source links, and a CSV download.
+- The demonstration screenshot contains no personal data and does not redistribute third-party book-cover artwork. It preserves the real interface, titles, authors, controls, and record count.
 - The source data is attributed to Books to Scrape, and the author enrichment sources and incompleteness are documented.
 
 ## Follow-up audit
